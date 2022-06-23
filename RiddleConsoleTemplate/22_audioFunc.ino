@@ -2,12 +2,24 @@
  * These functions interface with the DF Mini MP3 Player
  */
 
+//-------------- PLAY TRACK BY NUMBER ------------------------//
+/*
+ * This is the only function you need to call for basic use of the onboard MP3 player.
+ * Regardless of what the plater is currently doing,
+ * this function will begin the track called in the trackNum parameter.
+ * MP3 files should be on the MicroSD card's root directory,
+ * and named as a 4-digit number (0001-9999).
+ */
+void playTrack(word trackNum){
+  sendAudioCommand(0x03,trackNum);
+}
+
 //-------------- SEND AUDIO COMMAND --------------------------//
 
 void sendAudioCommand(byte command, word parameter){
-  /*
-   * The following byte values come from DF Robot
-   */
+/*
+ * The following byte values come from DF Robot
+ */
   byte startByte     = 0x7E;
   byte versionByte   = 0xFF;
   byte commandLength = 0x06;
@@ -41,11 +53,7 @@ void sendAudioCommand(byte command, word parameter){
   
 }
 
-//-------------- PLAY TRACK BY NUMBER ------------------------//
 
-void playTrack(word trackNum){
-  sendAudioCommand(0x03,trackNum);
-}
 
 //--
 

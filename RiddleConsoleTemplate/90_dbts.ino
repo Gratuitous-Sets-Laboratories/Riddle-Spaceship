@@ -4,7 +4,7 @@ void dbts(){
   if (spaceKey != spaceKeyOld){
     somethingNew = true;
   }
-  if (masterGo != masterGoOld){
+  if (masterGo != masterOld){
     somethingNew = true;
   }
   if (batteryInCharger != batteryInChargerOld){
