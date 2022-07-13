@@ -140,6 +140,7 @@ void setup() {
   digitalWrite(progLEDPin, HIGH);
   delay(500);
   digitalWrite(progLEDPin,LOW);
+  playTrack(1);
   Serial.println("Setup complete.");
   Serial.println();
 }
