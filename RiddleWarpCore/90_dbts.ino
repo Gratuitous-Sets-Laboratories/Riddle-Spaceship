@@ -1,5 +1,5 @@
 void dbts(){
-
+/*
   bool somethingNew = false;
   if (spaceKey != spaceKeyOld){
     somethingNew = true;
@@ -22,5 +22,5 @@ void dbts(){
     Serial.print(batteryInCharger);
     Serial.println();
   }
-
+*/
 }
