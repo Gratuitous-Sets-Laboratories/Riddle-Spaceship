@@ -10,7 +10,7 @@ void redFlash(int frameNum){
   }
 }
 
-void redFlash(int frameNum){
+void greenFlash(int frameNum){
   for (int pxl = 0; pxl < 8; pxl++){
     if (frameNum < 128){
       chargeLEDs.setPixelColor(pxl,frameNum*2,0,0);

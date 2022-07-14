@@ -7,7 +7,7 @@ void dbts(){
   if (masterGo != masterOld){
     somethingNew = true;
   }
-  if (batteryInCharger != batteryInChargerOld){
+  if (battInPlace != battInPlaceOld){
     somethingNew = true;
   }
   
@@ -18,8 +18,8 @@ void dbts(){
     Serial.print(spaceKey);
     Serial.print("\tmasterGo: ");
     Serial.print(masterGo);
-    Serial.print("\tbatteryInCh: ");
-    Serial.print(batteryInCharger);
+    Serial.print("\tbattInPlace: ");
+    Serial.print(battInPlace);
     Serial.println();
   }
 

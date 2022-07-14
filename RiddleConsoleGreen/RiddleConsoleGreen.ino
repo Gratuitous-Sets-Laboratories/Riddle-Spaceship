@@ -42,10 +42,9 @@
  * Pins not used for their standard fuction have header pins for alternate uses.
  */
 //.............. Digital Pins ................................//
-  #define battPin
-  #define crank1Pin
-  #define crank2Pin
-  #define chargeLEDPin
+  #define battPin 1
+  const int crankPin[2] = {1,1};
+  #define chargeLEDPin 1
   
   #define loadPin     2           // parallel connection to all 74HC165 PISO shift registers, pin 1
   #define dataInPin   3           // serial connection to nearest 74HC165 PISO shift register, pin 9
@@ -91,6 +90,7 @@
   byte gameStage = 0;
 
   bool battInPlace;
+  bool battInPlaceOld;
   bool lastCrankPos;
   bool tooFast;
   int crankCount;
@@ -240,7 +240,7 @@ void loop() {
  */
       battInPlace = digitalRead(battPin);       // reading the battPin determines if the battery is present
       if (!battInPlace){                        // if the battery isn't there...
-        redFlash(frame)                              // run an animaiton
+        redFlash(frame);                              // run an animaiton
       }
       else{                                           // otherwise (if there IS a battery)...
         if (digitalRead(crankPin[lastCrankPos])){     // if the crank is in the oposite position as it was last recorded...
@@ -257,7 +257,7 @@ void loop() {
       chargeAnimation(frame);
       }
       if (crankCount >= targetCrankCount){
-        playTrack(x);
+        playTrack(1);
         gameStage++;
       }
 
