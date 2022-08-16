@@ -188,6 +188,11 @@ void loop() {
   switch(gameStage){
 //------------------------------------------------------------//    
     case 0:                                                   // the main game is in progress, the master will pass signals between puzzles
+
+      bitWrite(progressByte,0,1);                             // allow the red console to be in play
+      bitWrite(progressByte,1,1);                             // allow the blue console to be in play
+      bitWrite(progressByte,2,1);                             // allow the green console to be in play
+      
       if (switchesComp) bitWrite(progressByte,3,1);           // if the switch puzzle is complete, allow the warp core to open
       if (wiresPatched) bitWrite(progressByte,6,1);           // if the wire puzzle is complete, allow the memory card puzzle to begin
 
