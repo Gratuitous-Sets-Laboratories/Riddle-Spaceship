@@ -22,7 +22,7 @@
  * Variables using '#define' are defined by hardware, and should be left alone.
  * Variables using 'const' can be changed to tune the puzzle.
  */
-  const String myNameIs = "RiddleConsoleTemplate 22 Jun 2022";// nametag for Serial monitor setup
+  const String myNameIs = "RiddleConsoleTemplate, Aug 2022";  // nametag for Serial monitor setup
   const byte correctKey = 4;                                  // 4 = green
 
   #define numKeyLEDs 1                                        // single pixel for the spaceKey
@@ -71,8 +71,8 @@
   bool masterGo;
   bool masterOld;
 
-  byte regByteNew[numPISOregs];
-  byte regByteOld[numPISOregs];
+  byte PISOdata[numPISOregs];
+  byte PISOprev[numPISOregs];
   
   byte gameStage = 0;
 
