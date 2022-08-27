@@ -155,13 +155,26 @@ void loop() {
   readPISO(0,1);                                              // read both PISO registers
   puzzleMISO  = PISOdata[1];                                  // globally rename the 2nd byte
   buttonState = PISOdata[0];                                  // globally rename the 1st byte
-  bool redConComp   = bitRead(puzzleMISO,0);                  // locally rename various bits of the 2nd byte
+                                                              // locally rename various bits of the 2nd byte
+  bool redConComp   = bitRead(puzzleMISO,0);                 
   bool bluConComp   = bitRead(puzzleMISO,1);
   bool grnConComp   = bitRead(puzzleMISO,2);
   bool battInPlace  = bitRead(puzzleMISO,3);
   bool wiresPatched = bitRead(puzzleMISO,4);
   bool switchesComp = bitRead(puzzleMISO,5);
   bool cardsInPlace = bitRead(puzzleMISO,6);
+
+  /* puzzleMOSI pin, MCN pin, & puzzle corolation
+   *  bit ltr puz
+   *  0   G  red
+   *  1   F  blu
+   *  2   E  grn
+   *  3   D  bat
+   *  4   C  wir
+   *  5   B  swt
+   *  6   A  crd
+   *  7   
+   */
 
 //============== GAME FLOW ===================================//
 

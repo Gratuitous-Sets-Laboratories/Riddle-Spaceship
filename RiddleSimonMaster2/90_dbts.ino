@@ -1,8 +1,9 @@
 void dbts(){
 
-  Serial.print("MOSI");
-  Serial.print(puzzleMISO,BIN);
-  Serial.print("MISO");
+  Serial.print("MOSI: ");
+  Serial.print(puzzleMOSI,BIN);
+  Serial.print(" ");
+  Serial.print("MISO: ");
   Serial.print(puzzleMISO,BIN);
   Serial.println();
 
@@ -14,7 +15,7 @@ void dbts(){
   }
 
   if (somethingNew){
-    printAllPISOdata();
+//    printAllPISOdata();
   }
 }
 
