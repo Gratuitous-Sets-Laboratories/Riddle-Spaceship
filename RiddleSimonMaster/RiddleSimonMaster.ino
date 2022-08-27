@@ -23,7 +23,7 @@
  * Variables using '#define' are defined by hardware, and should be left alone.
  * Variables using 'const' can be changed to tune the puzzle.
  */
-  const String myNameIs = "RiddleSimonMaster 12 Jul 2022";    // nametag for Serial monitor setup
+  const String myNameIs = "RiddleSimonMaster 27 Aug 2022";    // nametag for Serial monitor setup
 
   const int numberOfButtons = 5;
   const int answerLength = 8;
