@@ -34,6 +34,8 @@
   const int answerLength = 8;
   const int startingPoint = 3;
   const int triggerWindow = 5000;
+  const int playTime = 500;
+  const int pauseTime = 250;
   
  
 //-------------- PIN DE0FINITIONS  ----------------------------//
@@ -72,16 +74,21 @@
 
   byte PISOdata[numPISOregs];
   byte PISOprev[numPISOregs];
-  byte puzzleMISO;
-  byte puzzleMOSI;
-  byte buttonState;
-  
 //............................................................//
-  byte gameStage;
+  byte gameStage;                                             // used to tack entry point into switch/case
+  byte puzzleMISO;                                            // rename of PISOreg[0]
+
+  byte puzzleMOSI;                                            // SIPO output byte from MCH to downstream puzzles
+//............................................................//
   bool validAnswer;
   byte correctAnswer[answerLength];
   byte gameStep;
   byte entryStep;
+  byte buttonStates;                                          // rename of PISOreg[1]
+  byte buttonLights;
+  byte buttonNew;
+  byte buttonOld;
+  unsigned long tick;
 
 //============================================================//
 //============== SETUP =======================================//
@@ -130,7 +137,7 @@ void setup() {
 //-------------- SIMON SAYS SETUP ----------------------------//
 
   randomSeed(analogRead(A0));
-//  while (!validAnswer) createAnswer();
+  while (!validAnswer) createAnswer();
   gameStep = startingPoint;
   entryStep = 0;
 
@@ -153,8 +160,8 @@ void loop() {
 //-------------- Update Inputs -------------------------------//
 
   readPISO(0,1);                                              // read both PISO registers
-  puzzleMISO  = PISOdata[1];                                  // globally rename the 2nd byte
-  buttonState = PISOdata[0];                                  // globally rename the 1st byte
+  puzzleMISO = PISOdata[1];                                  // globally rename the 2nd byte
+  buttonStates = PISOdata[0];                                  // globally rename the 1st byte
                                                               // locally rename various bits of the 2nd byte
   bool redConComp   = bitRead(puzzleMISO,0);                 
   bool bluConComp   = bitRead(puzzleMISO,1);

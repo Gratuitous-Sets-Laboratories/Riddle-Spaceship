@@ -76,3 +76,10 @@ void sendSIPO(byte sr_data){
     pulsePin(clockPin,10);                                    // pulse the clock pin
   }
 }
+
+//-------------- WRITE TO BOTH PISO REGISTERS ----------------//
+ void sendToBothPISOs(){
+  sendSIPO(puzzleMOSI);
+  sendSIPO(buttonLights);
+  pulsePin(latchPin,10);
+ }
