@@ -1,7 +1,4 @@
-/*  
- * TACTICAL CONSOLE
- * Button Sequense & Switch Puzzle
- * 
+/*
  * GRATUITOUS SETS LABORATORIES
  * Dallas, TX, USA
  * 
@@ -24,13 +21,19 @@
  * Variables using '#define' are defined by hardware, and should be left alone.
  * Variables using 'const' can be changed to tune the puzzle.
  */
-  const String myNameIs = "RiddleConsoleRed2, 31 Aug 2022";   // nametag for Serial monitor setup
-  const byte correctKey = 1;                                  // 1 = red
-  const byte correctCourse[7] = {1,4,3,2,4,1,5};              // the correct answer for the navigation sequense
+  const String myNameIs = "RiddleConsoleGreen2, 31 Aug 2022"; // nametag for Serial monitor setup
+  const byte correctKey = 4;                                  // 4 = green
+
+  const int targetCrankCount = 40;
+  const int minCrankTime = 100;
+  const int frameDelay;
+//  const int maxCrankTime = 2500;
 
   #define numKeyLEDs 1                                        // single pixel for the spaceKey
+  #define numChargeLEDs 24
+  const int keyBright = 255;                                  // relative brightness of the Key's neoPixel (0-255)
 
-  #define numPISOregs 2                                       // total number of PISO shift registers (data in)
+  #define numPISOregs 1                                       // total number of PISO shift registers (data in)
   #define numSIPOregs 1                                       // total number of SIPO shift registers (data out)
 
 //-------------- PIN DE0FINITIONS  ----------------------------//
@@ -38,6 +41,10 @@
  * Pins not used for their standard fuction have header pins for alternate uses.
  */
 //.............. Digital Pins ................................//
+  #define battPin 1
+  const int crankPin[2] = {1,1};
+  #define chargeLEDPin 1
+  
   #define loadPin     2           // parallel connection to all 74HC165 PISO shift registers, pin 1
   #define dataInPin   3           // serial connection to nearest 74HC165 PISO shift register, pin 9
   #define latchPin    4           // parallel connection to all 74HC595 SIPO shift registers, pin 12
@@ -60,30 +67,41 @@
   Adafruit_NeoPixel keyLED = Adafruit_NeoPixel(
     numKeyLEDs, neoPixelPin, NEO_GRB + NEO_KHZ800
     );                                                        // neoPixel object name, # of pixels, signal pin, type
+  Adafruit_NeoPixel chargeLEDs = Adafruit_NeoPixel(
+    numChargeLEDs, chargeLEDPin, NEO_GRB + NEO_KHZ800
+    );                                                        // neoPixel object name, # of pixels, signal pin, type
 
   SoftwareSerial mp3Serial(audioRxPin, audioTxPin);           // RX, TX on Arduino side
 
 //-------------- GLOBAL VARIABLES ----------------------------//
 /* Decrlare variables used by various functions.
  */
-  bool masterGo;
+  bool masterGo;  
   bool masterOld;
   uint32_t masterTick;
-  
+ 
   bool lockReady;
   byte spaceKey;
   byte spaceKeyOld;
+  
+  bool masterGo;
+  bool masterOld;
 
-  byte PISOdata[numPISOregs];
-  byte PISOprev[numPISOregs];
+  byte regByteNew[numPISOregs];
+  byte regByteOld[numPISOregs];
   
   byte gameStage = 0;
 
-  byte sequense[7];
-  bool courseIsCorrect;
+  bool battInPlace;
+  bool battInPlaceOld;
+  bool lastCrankPos;
+  bool tooFast;
+  int crankCount;
+  uint32_t tick;
+  byte frame;
+  uint32_t frameTick;
 
-  byte lightByteNew;
-  byte lightByteOld;
+  word mp3Status;
 
 //============================================================//
 //============== SETUP =======================================//
@@ -121,11 +139,13 @@ void setup() {
 //-------------- NPX -----------------------------------------//
 
   keyLED.begin();
-  keyLED.setBrightness(255);
+  keyLED.setBrightness(keyBright);
   keyLED.show();
+  chargeLEDs.begin();
+  chargeLEDs.setBrightness(keyBright);
+  chargeLEDs.show();
 
-  sendSIPO(0);
-  pulsePin(latchPin,10);
+  //sendLightByte(0);
 
 //-------------- MP3 ------------------------------------------//
 
@@ -140,7 +160,6 @@ void setup() {
   digitalWrite(progLEDPin, HIGH);
   delay(500);
   digitalWrite(progLEDPin,LOW);
-  playTrack(1);
   Serial.println("Setup complete.");
   Serial.println();
 }
@@ -153,9 +172,9 @@ void loop() {
 
 //-------------- Update Inputs -------------------------------//
 
-  querryMaster();                       // check for master signal
+ querryMaster();       // check for master signal
   readSpaceKey();                       // determine which key (if any) is in the lock
-  readPISO(0,1);                        // read both PISO registers
+//  readRegisters(0,0);                   // read the first PISO register
 
 //-------------- Puzzle Flow ---------------------------------//
 /*
@@ -170,22 +189,22 @@ void loop() {
     case 0:
                                               // while in stage 0...
       digitalWrite (relay1Pin, LOW);          // disengage onboard relay 1
+      digitalWrite (relay2Pin, LOW);          // disengage onboard relay 2
       digitalWrite (xOutPin, LOW);            // bring 12V output LOW
-      sendSIPO(0);                            // send a null byte to SIPO register
-      pulsePin(latchPin,10);
+//      sendLightByte(0);                       // send a null byte to SIPO register (when applicable)
 
-      if (masterGo){                          // if the master input is HIGH...
-        gameStage++;                          // advance the gameStage
+      if (masterGo){
+        gameStage++;
       }
-      break;                                  // EXIT SWITCH CASE
+      break;
       
 //-------------- 1: Space Key --------------------------------//
     case 1:
                                               // while in stage 1...
       digitalWrite (relay1Pin, LOW);          // disengage onboard relay 1
+      digitalWrite (relay2Pin, LOW);          // disengage onboard relay 2
       digitalWrite (xOutPin, LOW);            // bring 12V output LOW
-      sendSIPO(0);                            // send a null byte to SIPO register (when applicable)
-      pulsePin(latchPin,10);
+      sendLightByte(0);                       // send a null byte to SIPO register (when applicable)
       
       if (lockReady && spaceKey){             // if there was no key in the lock & now there is...
         lockReady = false;                    // the lock is no longer flagged as ready
@@ -210,39 +229,53 @@ void loop() {
     case 2:
                                               // while in stage 2...
       digitalWrite (relay1Pin, HIGH);         // engage onboard relay 1 to fire up the consoles acrylic screens
+      digitalWrite (relay2Pin, LOW);          // keep onboard relay 2 disengaged
       digitalWrite (xOutPin, LOW);            // keep 12V output LOW
 
-      courseButtons();                        // check the course button portion of the puzzle
-      if (courseIsCorrect){                 // if that's been solved...
-        gameStage++;                          // and advance the gameStage
+      //
+/*
+ * looking for:
+ * battery
+ * crank phesiis
+ * outuptting:
+ * sounds (MP3)
+ * NPX
+ */
+      battInPlace = digitalRead(battPin);       // reading the battPin determines if the battery is present
+      if (!battInPlace){                        // if the battery isn't there...
+        redFlash(frame);                              // run an animaiton
+      }
+      else{                                           // otherwise (if there IS a battery)...
+        if (digitalRead(crankPin[lastCrankPos])){     // if the crank is in the oposite position as it was last recorded...
+          if (millis() >= tick + minCrankTime){       // and if the player isn't cranking too fast...
+            tick = millis();                          // update the crank timestamp
+            tooFast = false;
+            lastCrankPos++;                           // flop the expected crank position
+            crankCount++;                             // credit the player with a crank
+          }
+          else{
+            tooFast = true;
+          }
+        }
+      chargeAnimation(frame);
+      }
+      if (crankCount >= targetCrankCount){
+        playTrack(1);
+        gameStage++;
       }
 
-      break;                                  // EXIT SWITCH CASE
+      break;
       
 //-------------- 3: Puzzle Solved ----------------------------//
     case 3:
                                               // while in stage 3...
       digitalWrite (relay1Pin, HIGH);         // engage onboard relay 1 to fire up the consoles acrylic screens
+      digitalWrite (relay2Pin, HIGH);         // engage onboard relay 1
       digitalWrite (xOutPin, HIGH);           // send 12V output HIGH
 
-      break;                                  // EXIT SWITCH CASE
-  }
-  
-//-------------- Switch Puzzle -------------------------------//
-/*
- * The switch puzzle does not require any input before it is playable,
- * thus it is outside of the gameStage switch case.
- */
-  if (PISOdata[1] == 0) lightByteNew = 0;
-  switchPuzzle();
-  if (lightByteNew == 255){
-    digitalWrite (relay2Pin, HIGH);
-  }
-  else{
-    digitalWrite (relay2Pin, LOW);
-  }
-  if (lightByteNew == 255 && lightByteNew != lightByteOld){
-    // audio feedback
+      greenFlash(frame);
+
+      break;
   }
 
 //-------------- Routine Maintainance ------------------------//
