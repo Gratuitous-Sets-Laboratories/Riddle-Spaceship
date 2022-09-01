@@ -194,7 +194,7 @@ void loop() {
       if (wiresPatched) bitWrite(puzzleMOSI,6,1);             // if the wire puzzle is complete, allow the memory card puzzle to begin
       
       sendSIPO(puzzleMOSI);                                   // send the puzzleMOSI data to the master hub
-      sendSIPO(0);                                            // send a blank byte for the button LEDs
+      sendSIPO(255);                                            // send a blank byte for the button LEDs
       pulsePin(latchPin,10);                                  // latch both SIPO registers
       
       if (puzzleMISO%16 == 15){                               // if all 3 consoles and the warp core are reporting completion...

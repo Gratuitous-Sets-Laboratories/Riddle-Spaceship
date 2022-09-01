@@ -13,6 +13,8 @@ void dbts(){
     Serial.print(gameStage);
     Serial.print("\tspaceKey: ");
     Serial.print(spaceKey);
+    Serial.print("\tmasterAnalog: ");
+    Serial.print(analogRead(xInPin));
     Serial.print("\tmasterGo: ");
     Serial.print(masterGo);
     Serial.println();

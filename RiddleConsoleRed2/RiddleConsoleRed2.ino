@@ -66,15 +66,15 @@
 //-------------- GLOBAL VARIABLES ----------------------------//
 /* Decrlare variables used by various functions.
  */
+  byte PISOdata[numPISOregs];
+  byte PISOprev[numPISOregs];
+ 
   bool lockReady;
   byte spaceKey;
   byte spaceKeyOld;
   
   bool masterGo;
   bool masterOld;
-
-  byte PISOdata[numPISOregs];
-  byte PISOprev[numPISOregs];
   
   byte gameStage = 0;
 
@@ -152,9 +152,11 @@ void loop() {
 
 //-------------- Update Inputs -------------------------------//
 
-  masterGo = digitalRead(xInPin);       // check for master signal
+  masterGo = true;
+  if (analogRead(xInPin) <= 100) masterGo = false;
+  //masterGo = digitalRead(xInPin);       // check for master signal
   readSpaceKey();                       // determine which key (if any) is in the lock
-  readPISO(0,1);                   // read both PISO registers
+  readPISO(0,1);                        // read both PISO registers
 
 //-------------- Puzzle Flow ---------------------------------//
 /*
@@ -170,7 +172,7 @@ void loop() {
                                               // while in stage 0...
       digitalWrite (relay1Pin, LOW);          // disengage onboard relay 1
       digitalWrite (xOutPin, LOW);            // bring 12V output LOW
-      sendSIPO(0);                            // send a null byte to SIPO register
+      sendSIPO(0);                            // send a null byte to SIPO register (for switch puzzle buttons)
       pulsePin(latchPin,10);
 
       if (masterGo){                          // if the master input is HIGH...
@@ -183,7 +185,7 @@ void loop() {
                                               // while in stage 1...
       digitalWrite (relay1Pin, LOW);          // disengage onboard relay 1
       digitalWrite (xOutPin, LOW);            // bring 12V output LOW
-      sendSIPO(0);                            // send a null byte to SIPO register (when applicable)
+      sendSIPO(0);                            // send a null byte to SIPO register (for switch puzzle buttons)
       pulsePin(latchPin,10);
       
       if (lockReady && spaceKey){             // if there was no key in the lock & now there is...
