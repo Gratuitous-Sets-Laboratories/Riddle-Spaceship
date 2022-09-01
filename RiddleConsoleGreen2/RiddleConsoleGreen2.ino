@@ -78,14 +78,11 @@
  */
   bool masterGo;  
   bool masterOld;
-  uint32_t masterTick;
+  uint32_t masterGoTick;
  
   bool lockReady;
   byte spaceKey;
   byte spaceKeyOld;
-  
-  bool masterGo;
-  bool masterOld;
 
   byte regByteNew[numPISOregs];
   byte regByteOld[numPISOregs];
@@ -172,7 +169,7 @@ void loop() {
 
 //-------------- Update Inputs -------------------------------//
 
- querryMaster();       // check for master signal
+  querryMaster();       // check for master signal
   readSpaceKey();                       // determine which key (if any) is in the lock
 //  readRegisters(0,0);                   // read the first PISO register
 

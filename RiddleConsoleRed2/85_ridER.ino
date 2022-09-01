@@ -16,7 +16,7 @@ void querryMaster(){
     masterGoTick = millis();
   }
   else{
-    if (millis() >= masterTick){
+    if (millis() >= masterGoTick + debounceDelay){
       masterGo = false;
     }
   }

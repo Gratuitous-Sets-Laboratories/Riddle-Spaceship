@@ -68,7 +68,7 @@
  */
   bool masterGo;
   bool masterOld;
-  uint32_t masterTick;
+  uint32_t masterGoTick;
   
   bool lockReady;
   byte spaceKey;
