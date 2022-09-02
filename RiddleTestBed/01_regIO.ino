@@ -7,6 +7,8 @@
  * byte PISOdata[numPISOregs];
  * 
  * Devices use 74HC165 PISO registers and 74HC595 SIPO registers.
+ * 
+ * This section updated  Aug 2022
  */
 
 //-------------- RISING EDGE PUSLE ---------------------------//

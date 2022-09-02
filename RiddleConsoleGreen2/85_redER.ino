@@ -6,7 +6,7 @@ void querryMaster(){
 /*
  * This function will use the following global variables:
  * bool masterGo;
- * uint32_t masterTick;
+ * uint32_t masterGoTick;
  */
 
   int debounceDelay = 1000;
