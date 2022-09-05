@@ -1,4 +1,9 @@
 void redFlash(int frameNum){
+  for (int pxl =0; pxl < 8; pxl++){
+    chargeLEDs.setPixelColor(pxl,255,0,0);
+  }
+  chargeLEDs.show();
+/*
   for (int pxl = 0; pxl < 8; pxl++){
     if (frameNum < 128){
       chargeLEDs.setPixelColor(pxl,0,frameNum*2,0);
@@ -8,6 +13,7 @@ void redFlash(int frameNum){
     }
     chargeLEDs.show();
   }
+*/
 }
 
 void greenFlash(int frameNum){

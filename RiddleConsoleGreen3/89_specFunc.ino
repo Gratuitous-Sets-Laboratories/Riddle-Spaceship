@@ -9,7 +9,7 @@ void querryMaster(){
  * uint32_t masterGoTick;
  */
 
-  int debounceDelay = 1000;
+  int debounceDelay = 3000;
 
   if (digitalRead(xInPin)){
     masterGo = true;

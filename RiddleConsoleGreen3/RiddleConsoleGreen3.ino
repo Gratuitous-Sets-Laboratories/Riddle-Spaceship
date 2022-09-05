@@ -234,8 +234,8 @@ void loop() {
  * sounds (MP3)
  * NPX
  */
-      battInPlace = digitalRead(cradlePin);       // reading the battPin determines if the battery is present
-      if (!battInPlace){                        // if the battery isn't there...
+      battInPlace = digitalRead(cradlePin);           // reading the battPin determines if the battery is present
+      if (!battInPlace){                              // if the battery isn't there...
         redFlash(frame);                              // run an animaiton
       }
       else{                                           // otherwise (if there IS a battery)...
