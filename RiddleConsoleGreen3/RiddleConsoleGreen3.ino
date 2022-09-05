@@ -22,8 +22,8 @@
  * Variables using 'const' can be changed to tune the puzzle.
  */
   const String myNameIs = "RiddleConsoleGreen3";              // name of sketch
-  const String verNum = "Beta";                               // version of sketch
-  const String lastUpdate = "2022 Sept 03";                   // last update
+  const String verNum = "B.3";                               // version of sketch
+  const String lastUpdate = "2022 Sept 05";                   // last update
 
 //............. Harware Installed ............................//
   #define numPISOregs 1                                       // total number of PISO shift registers (data in)
@@ -34,7 +34,7 @@
 
   const int targetCrankCount = 40;
   const int minCrankTime = 100;
-  const int frameDelay;
+  const int frameDelay = 100;
 //  const int maxCrankTime = 2500;
 
 
@@ -239,6 +239,8 @@ void loop() {
         redFlash(frame);                              // run an animaiton
       }
       else{                                           // otherwise (if there IS a battery)...
+        greenFlash(frame);
+/*
         if (digitalRead(crankPin[lastCrankPos])){     // if the crank is in the oposite position as it was last recorded...
           if (millis() >= tick + minCrankTime){       // and if the player isn't cranking too fast...
             tick = millis();                          // update the crank timestamp
@@ -251,6 +253,7 @@ void loop() {
           }
         }
       chargeAnimation(frame);
+*/
       }
       if (crankCount >= targetCrankCount){
         playTrack(1);

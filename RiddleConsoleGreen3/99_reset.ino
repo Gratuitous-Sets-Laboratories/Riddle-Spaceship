@@ -9,6 +9,9 @@ void cycleReset(){
   masterOld = masterGo;
   battInPlaceOld = battInPlace;
 
-  if (millis() >= frameTick + frameDelay) frame++;
+  if (millis() >= frameTick + frameDelay){
+    frame++;
+    frameTick = millis();
+  }
 
 }
