@@ -22,8 +22,8 @@
  * Variables using 'const' can be changed to tune the puzzle.
  */
   const String myNameIs = "RiddleConsoleGreen3";              // name of sketch
-  const String verNum = "B.3";                               // version of sketch
-  const String lastUpdate = "2022 Sept 05";                   // last update
+  const String verNum = "B.4";                               // version of sketch
+  const String lastUpdate = "2022 Sept 19";                   // last update
 
 //............. Harware Installed ............................//
   #define numPISOregs 1                                       // total number of PISO shift registers (data in)
@@ -32,13 +32,13 @@
 //.............. Game Tuning .................................//
   const byte correctKey = 4;                                  // 4 = green
 
-  const int targetCrankCount = 40;
+  const int chargePerCrank = 5;
   const int minCrankTime = 100;
-  const int frameDelay = 100;
+  const int frameDelay = 50;
 //  const int maxCrankTime = 2500;
 
 
-//-------------- PIN DE0FINITIONS  ----------------------------//
+//-------------- PIN DEFINITIONS  ----------------------------//
 /* Most of the I/O pins on the Arduino Nano are hard-wired to various components on the ARDNEX2.
  * Pins not used for their standard fuction have header pins for alternate uses.
  */
@@ -186,6 +186,7 @@ void loop() {
       digitalWrite (relay1Pin, LOW);          // disengage onboard relay 1
       digitalWrite (relay2Pin, LOW);          // disengage onboard relay 2
       digitalWrite (xOutPin, LOW);            // bring 12V output LOW
+      crankCount = 0;
 
       if (masterGo){
         gameStage++;
@@ -235,29 +236,36 @@ void loop() {
  * NPX
  */
       battInPlace = digitalRead(cradlePin);           // reading the battPin determines if the battery is present
+
       if (!battInPlace){                              // if the battery isn't there...
         redFlash(frame);                              // run an animaiton
       }
-      else{                                           // otherwise (if there IS a battery)...
-        greenFlash(frame);
-/*
+ 
+      else{                                           // otherwise (if there IS a battery)...               
+ 
         if (digitalRead(crankPin[lastCrankPos])){     // if the crank is in the oposite position as it was last recorded...
+
+          tick = millis();                          // update the crank timestamp
           if (millis() >= tick + minCrankTime){       // and if the player isn't cranking too fast...
-            tick = millis();                          // update the crank timestamp
             tooFast = false;
             lastCrankPos++;                           // flop the expected crank position
-            crankCount++;                             // credit the player with a crank
+            crankCount += chargePerCrank;             // credit the player with a crank
           }
           else{
             tooFast = true;
+            lastCrankPos++;
           }
         }
-      chargeAnimation(frame);
-*/
+        cycleAnimation(frame,tooFast);   
       }
-      if (crankCount >= targetCrankCount){
+      
+      showChargeLevel(crankCount);
+      chargeLEDs.show();
+      
+      if (crankCount >= 255){
         playTrack(1);
         gameStage++;
+ //       break;
       }
 
       break;
@@ -269,6 +277,7 @@ void loop() {
       digitalWrite (relay2Pin, HIGH);         // engage onboard relay 1
       digitalWrite (xOutPin, HIGH);           // send 12V output HIGH
 
+      showChargeLevel(255);
       greenFlash(frame);
 
       break;

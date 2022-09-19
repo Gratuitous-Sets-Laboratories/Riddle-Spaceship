@@ -14,14 +14,18 @@ void dbts(){
   }
   
   if (somethingNew){
-    Serial.print("gameStage: ");
+    Serial.print("masterGo: ");
+    Serial.print(masterGo);
+    Serial.print("\tgameStage: ");
     Serial.print(gameStage);
     Serial.print("\tspaceKey: ");
     Serial.print(spaceKey);
-    Serial.print("\tmasterGo: ");
-    Serial.print(masterGo);
     Serial.print("\tbattInPlace: ");
     Serial.print(battInPlace);
+    Serial.print("\tlastCrankPos: ");
+    Serial.print(lastCrankPos);
+    Serial.print("\tcrankCount");
+    Serial.print(crankCount);
     Serial.println();
   }
 }
