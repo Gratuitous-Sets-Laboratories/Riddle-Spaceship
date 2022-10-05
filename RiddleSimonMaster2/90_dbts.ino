@@ -1,21 +1,15 @@
 void dbts(){
-
+/*
   Serial.print("MOSI: ");
   Serial.print(puzzleMOSI,BIN);
   Serial.print(" ");
   Serial.print("MISO: ");
   Serial.print(puzzleMISO,BIN);
   Serial.println();
-
-
-  bool somethingNew = false;
-
-  for (int reg = 0; reg < numPISOregs; reg++){
-    if (PISOdata != PISOprev) somethingNew = true;
-  }
+*/
 
   if (somethingNew){
-//    printAllPISOdata();
+    printAllPISOdata();
   }
 }
 

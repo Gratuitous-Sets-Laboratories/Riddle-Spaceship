@@ -7,6 +7,10 @@ void cycleReset(){
   for (int reg = 0; reg < numPISOregs; reg++){
     PISOprev[reg] = PISOdata[reg];
   }
-//  buttonOld = buttonNew;
+  if (buttonNew){
+    buttonOld = buttonNew;
+  }
+
+  somethingNew = false;
 
 }

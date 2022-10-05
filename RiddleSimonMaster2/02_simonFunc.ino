@@ -78,13 +78,26 @@ void demonstrate (int upTo, int buzzTime){
 /*
  * 
  */
-void readButtons(){
+void buttonRead(){
 
   buttonNew = 0;
-  for(int btn=0; btn<numberOfButtons; btn++){
-    if (bitRead(buttonStates,btn) == 0){
+  for(int btn = 0; btn < numberOfButtons; btn++){
+    if (bitRead(buttonStates, btn) == 0){
       buttonNew = btn+1;
     }
+  }
+}
+
+//============================================================//
+//============== CHECK ANSWER ================================//
+//============================================================//
+
+bool soFarSoGood(){
+  for (int seqPos = 0; seqPos <= entryStep; seqPos++){
+    if (currentAnswer[seqPos] != correctAnswer[seqPos]){
+      return false;
+    }
+    else return true;
   }
 }
 
@@ -118,7 +131,7 @@ void fail(){
   buttonLights = 0;
   sendToBothPISOs();
 
-  gameStep = startingPoint;
+  simonStep = startingPoint;
   entryStep = 0;
-  demonstrate(gameStep,playTime);
+//  demonstrate(simonStep,playTime);
 }

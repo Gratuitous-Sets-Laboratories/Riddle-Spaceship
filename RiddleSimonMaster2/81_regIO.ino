@@ -19,7 +19,8 @@
  * pulseTime (given in microseconds)
  */
 
-void pulsePin(int pinName, int pulseTime){
+void pulsePin(int pinName){
+  int pulseTime = 10;
   digitalWrite(pinName, LOW);
   delayMicroseconds(pulseTime);
   digitalWrite(pinName, HIGH);
@@ -39,18 +40,18 @@ void pulsePin(int pinName, int pulseTime){
  
 void readPISO(int fReg, int lReg){
 
-  pulsePin(loadPin,10);                                       // rend a rising edge signal to load the current data into the registers
+  pulsePin(loadPin);                                          // rend a rising edge signal to load the current data into the registers
   
   for (int dumpReg = 0; dumpReg < fReg; dumpReg++){           // for each register before the first one called for...
     for (int dumpBit = 0; dumpBit < 8; dumpBit++){            // for each bit in that register's byte...
-      pulsePin(clockPin,10);                                  // pulse the clock pin to skip that bit
+      pulsePin(clockPin);                                     // pulse the clock pin to skip that bit
     }
   }
   for (int readReg = fReg; readReg < lReg+1; readReg++){      // for each requested register...
     for (int pos = 0; pos < 8; pos++){                        // for each bit in that register's byte...
       bool val = digitalRead(dataInPin);                      // read the bit's value from the input pin
       bitWrite(PISOdata[readReg], pos, val);                  // write it to the approriate position in the appropriate byte
-      pulsePin(clockPin,10);                                  // pulse the clock pin to advance the next bit
+      pulsePin(clockPin);                                     // pulse the clock pin to advance the next bit
     }
   }
 }
@@ -73,7 +74,7 @@ void sendSIPO(byte sr_data){
   for (int pos=0; pos<8; pos++){                              // for each bit in the byte...
     bool bitVal = bitRead(sr_data, pos);                      // note its value from the paramater
     digitalWrite(dataOutPin, bitVal);                         // write it to the data pin
-    pulsePin(clockPin,10);                                    // pulse the clock pin
+    pulsePin(clockPin);                                       // pulse the clock pin
   }
 }
 
@@ -81,5 +82,5 @@ void sendSIPO(byte sr_data){
  void sendToBothPISOs(){
   sendSIPO(puzzleMOSI);
   sendSIPO(buttonLights);
-  pulsePin(latchPin,10);
+  pulsePin(latchPin);
  }

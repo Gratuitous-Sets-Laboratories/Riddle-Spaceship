@@ -24,7 +24,7 @@
  */
  
   #define numPISOregs 2                                       // total number of PISO shift registers (data in)
-  #define numLEDs 3                                           // single pixel for the spaceKey
+  #define numLEDs 3                                           //
 
   const String myNameIs = "RiddleSimonMaster2 Aug 2022 (B)";  // nametag for Serial monitor setup
   
@@ -74,6 +74,7 @@
 
   byte PISOdata[numPISOregs];
   byte PISOprev[numPISOregs];
+  bool somethingNew;
 //............................................................//
   byte gameStage;                                             // used to tack entry point into switch/case
   byte puzzleMISO;                                            // rename of PISOreg[0]
@@ -82,8 +83,10 @@
 //............................................................//
   bool validAnswer;
   byte correctAnswer[answerLength];
-  byte gameStep;
+  byte currentAnswer[answerLength];
+  byte simonStep;
   byte entryStep;
+//  bool soFarSoGood;
   byte buttonStates;                                          // rename of PISOreg[1]
   byte buttonLights;
   byte buttonNew;
@@ -138,7 +141,7 @@ void setup() {
 
   randomSeed(analogRead(A0));
   while (!validAnswer) createAnswer();
-  gameStep = startingPoint;
+  simonStep = startingPoint;
   entryStep = 0;
 
 //-------------- A/V FEEDBACK --------------------------------//
@@ -160,10 +163,16 @@ void loop() {
 //-------------- Update Inputs -------------------------------//
 
   readPISO(0,1);                                              // read both PISO registers
-  puzzleMISO = PISOdata[1];                                  // globally rename the 2nd byte
-  buttonStates = PISOdata[0];                                  // globally rename the 1st byte
-                                                              // locally rename various bits of the 2nd byte
-  bool redConComp   = bitRead(puzzleMISO,0);                 
+
+  for (int reg = 0; reg < numPISOregs; reg++){                // for each register...
+    if (PISOdata[reg] != PISOprev[reg]){                      // if its byte has changed since last cycle...
+      somethingNew = true;                                    // raise the somethingNew flag
+    }
+  }
+  
+  puzzleMISO = PISOdata[1];                                   // globally rename the 2nd byte
+  buttonStates = PISOdata[0];                                 // globally rename the 1st byte                                                           
+  bool redConComp   = bitRead(puzzleMISO,0);                  // locally rename various bits of the 2nd byte
   bool bluConComp   = bitRead(puzzleMISO,1);
   bool grnConComp   = bitRead(puzzleMISO,2);
   bool battInPlace  = bitRead(puzzleMISO,3);
@@ -194,20 +203,50 @@ void loop() {
       if (wiresPatched) bitWrite(puzzleMOSI,6,1);             // if the wire puzzle is complete, allow the memory card puzzle to begin
       
       sendSIPO(puzzleMOSI);                                   // send the puzzleMOSI data to the master hub
-      sendSIPO(255);                                            // send a blank byte for the button LEDs
-      pulsePin(latchPin,10);                                  // latch both SIPO registers
+      sendSIPO(255);                                          // send a blank byte for the button LEDs
+      pulsePin(latchPin);                                     // latch both SIPO registers
       
       if (puzzleMISO%16 == 15){                               // if all 3 consoles and the warp core are reporting completion...
+        simonStep = startingPoint;                            // put the players at the designated step in the Simon game
+        entryStep = 0;
         gameStage++;                                          // advance the gameStage
       }
       break;                                                  // END CASE
 
 //-------------- Simon Demonstration--------------------------//
     case 1:
+      demonstrate(simonStep, 1000);                           // demonstrate the correct sequense up to the current simonStep
+      gameStage++;                                            // advance the gameStage
+
+//-------------- Simon Play ----------------------------------//
+    case 2:
+      buttonRead();                                           // read the latest button press
+      if (buttonNew && (buttonNew != buttonOld)){             // if there is a press and it's different from the last one...
+        currentAnswer[entryStep] = buttonNew;                 // record that as the current entryStep
+        
+        if(soFarSoGood){                                      // if the sequense is looking good...
+          entryStep++;                                        // advance the entryStep
+        }
+        else{                                                 // otherwise...
+          fail();                                             // failure protocols
+          break;
+        }
+        if (entryStep > simonStep){                           // if the (newly advanced) entryStep would put the players past the simonStep...
+          entryStep = 0;                                      // reset the entryStep
+          simonStep++;                                        // increment the simonStep
+          gameStage = 1;                                      // set gameStage to play the demonstration
+        }
+        if (simonStep > answerLength){                        // if the (newly advanced simonStep would put the players past the finish line...
+          gameStage = 3;                                      // trigger victory
+        }
+      }
+      break;                                                  // END CASE
+
+//-------------- Victory -------------------------------------//
+    case 3:
+      // VICTORY CONDITIONS
       break;
-
-
-  }
+  }                                                           // final switch case brace
 
 //-------------- Routine Maintainance ------------------------//
 
